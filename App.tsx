@@ -52,8 +52,13 @@ export default function App() {
         const tokenInfos: TokenInfo[] = [];
         for (const line of result.tokens) {
           for (const token of line) {
-            const explanations = (token as ThemedToken & { explanation?: Array<{ scopeName: string }> }).explanation;
-            const scopes = explanations?.map((e) => e.scopeName).join(" > ") || "unknown";
+            // explanation is Array<{ content: string; scopes: Array<{ scopeName: string }> }>
+            const tokenWithExplanation = token as ThemedToken & {
+              explanation?: Array<{ content: string; scopes: Array<{ scopeName: string }> }>;
+            };
+            const scopes = tokenWithExplanation.explanation
+              ?.flatMap((e) => e.scopes.map((s) => s.scopeName))
+              .join(" > ") || "unknown";
             tokenInfos.push({
               content: token.content,
               color: token.color || "#fff",
